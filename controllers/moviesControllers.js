@@ -8,8 +8,15 @@ const index = (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Errore nella query del database', err });
     }
-    console.log(req.body);
-    res.json(results);
+    const imagePath = require('../middlewares/imagePath')
+    const movies = results.map(movie => {
+      return {
+        ...movie,
+        image: req.imagePath + movie.image
+      }
+    })
+
+    res.json(movies);
   });
 };
 

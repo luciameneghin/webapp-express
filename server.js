@@ -5,11 +5,12 @@ const port = process.env.PORT || 3000;
 
 const moviesRouter = require('./routes/moviesRouters')
 
-
 //middleware import
 const errorsHandler = require('./middlewares/errorsHandler')
 const notFound = require('./middlewares/notFound')
+const imagePath = require('./middlewares/imagePath')
 
+app.use(imagePath)
 app.use(express.static('public'))
 app.use(express.json())
 
