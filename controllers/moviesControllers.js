@@ -35,23 +35,42 @@ const show = (req, res) => {
       return res.status(404).json({ error: 'post non trovato' })
     }
 
-    let movie = results[0]
+    const movie = results[0]
+    //console.log(movie);
 
     connection.query(sqlReviews, [id], (e, reviewsResaults) => {
       if (e) return res.status(500).json({ error: 'Errore nella query del database', err });
       movie.reviews = reviewsResaults;
+      // console.log(reviewsResaults);
       const movies = results.map(movie => {
         return {
           ...movie,
           image: req.imagePath + movie.image
         }
       })
+      res.json(movies[0]);
 
-      res.json(movies);
     })
   })
 }
 
+
+
+const storeReviews = (req, res) => {
+  console.log('qualcosa');
+  const id = req.params.id;
+  const sql = 'INSERT INTO reviews (text, name, vote, movie_id) VALUES(?,?,?,?)'
+  const { text, name, vote } = req.body;
+
+  connection.query(sql, [text, name, vote, id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Errore nella query del database', err });
+    }
+    res.status(201);
+    console.log(results);
+    res.json({ message: 'Review added', id: results.insertId })
+  })
+}
 module.exports = {
-  index, show
+  index, show, storeReviews
 }
