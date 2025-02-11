@@ -80,7 +80,7 @@ const store = (req, res) => {
   const imageName = req.file.filename;
 
   //gestisco insert, imposto query
-  const sql = "INSERT INTO movies(title, derector, abstract, image) VALUES(?,?,?,?)"
+  const sql = "INSERT INTO movies(title, director, abstract, image) VALUES(?,?,?,?)"
   //uso query
   connection.query(sql, [title, director, abstract, imageName], (err, results) => {
     if (err) {

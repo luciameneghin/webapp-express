@@ -4,7 +4,7 @@ const multer = require('multer')
 //metodo di multer per salvare nell'hardisk fisico il file
 const storage = multer.diskStorage({
   //stabilisco destinazione
-  destination: './public/movies_cover',
+  destination: "./public/movies_cover",
   filename: (req, file, cb) => {
     console.log(file); //tutte le info che mi scendono posso gestirle qua dentro al multer
     //creo un nome univoco per il file
