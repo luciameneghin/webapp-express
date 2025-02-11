@@ -12,7 +12,7 @@ const index = (req, res) => {
     const movies = results.map(movie => {
       return {
         ...movie,
-        image: req.imagePath + movie.image
+        image: req.imagePath + movie.image,
       }
     })
 
@@ -27,9 +27,9 @@ const show = (req, res) => {
   FROM reviews R
   WHERE R.movie_id = ?`
 
-  connection.query(sqlMovies, [id], (e, results) => {
-    if (e) {
-      return res.status(500).json({ error: 'Errore nella query del database', err });
+  connection.query(sqlMovies, [id], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Errore nella query del database', error });
     }
     if (results.length === 0) {
       return res.status(404).json({ error: 'post non trovato' })
@@ -38,8 +38,8 @@ const show = (req, res) => {
     const movie = results[0]
     //console.log(movie);
 
-    connection.query(sqlReviews, [id], (e, reviewsResaults) => {
-      if (e) return res.status(500).json({ error: 'Errore nella query del database', err });
+    connection.query(sqlReviews, [id], (err, reviewsResaults) => {
+      if (err) return res.status(500).json({ error: 'Errore nella query del database', error });
       movie.reviews = reviewsResaults;
       // console.log(reviewsResaults);
       const movies = results.map(movie => {
@@ -71,6 +71,26 @@ const storeReviews = (req, res) => {
     res.json({ message: 'Review added', id: results.insertId })
   })
 }
+
+
+const store = (req, res) => {
+  console.log(req.file); // mi mostra tutte le info dell'immagine che upload dal sito
+  const { title, director, abstract } = req.body; //l'imm non serve perchè gestitata a parte
+  //nome del file che è stato uploadato
+  const imageName = req.file.filename;
+
+  //gestisco insert, imposto query
+  const sql = "INSERT INTO movies(title, derector, abstract, image) VALUES(?,?,?,?)"
+  //uso query
+  connection.query(sql, [title, director, abstract, imageName], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Errore nella query del database', err });
+    }
+    res.status(201).json({ status: 'success', message: 'film aggiunto' })
+  })
+}
+
+
 module.exports = {
-  index, show, storeReviews
+  index, show, storeReviews, store
 }
