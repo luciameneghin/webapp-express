@@ -7,7 +7,7 @@ const cors = require('cors');
 const moviesRouter = require('./routes/moviesRouters')
 
 app.use(cors({
-  origin: 'http://localhost:5173'
+  origin: 'http://localhost:5173',
 }));
 //middleware import
 
