@@ -1,5 +1,6 @@
 const connection = require('../data/db')
-
+const path = require('path')
+const fs = require('fs')
 
 const index = (req, res) => {
   const sql = 'SELECT * FROM movies';
@@ -75,14 +76,14 @@ const storeReviews = (req, res) => {
 
 const store = (req, res) => {
   console.log(req.file); // mi mostra tutte le info dell'immagine che upload dal sito
-  const { title, director, abstract } = req.body; //l'imm non serve perchè gestitata a parte
+  const { title, director, abstract, genre, release_year } = req.body; //l'imm non serve perchè gestitata a parte
   //nome del file che è stato uploadato
   const imageName = req.file.filename;
 
   //gestisco insert, imposto query
-  const sql = "INSERT INTO movies(title, director, abstract, image) VALUES(?,?,?,?)"
+  const sql = "INSERT INTO movies(title, director, abstract, genre, release_year, image) VALUES(?,?,?,?,?,?)"
   //uso query
-  connection.query(sql, [title, director, abstract, imageName], (err, results) => {
+  connection.query(sql, [title, director, abstract, genre, release_year, imageName], (err, results) => {
     if (err) {
       return res.status(500).json({ error: 'Errore nella query del database', err });
     }
@@ -91,6 +92,35 @@ const store = (req, res) => {
 }
 
 
+const destroy = (req, res) => {
+  const id = req.params.id;
+
+  const sqlSelect = "SELECT image FROM movies WHERE id =?"
+  const sqlDelete = 'DELETE FROM movies WHERE id = ?'
+  connection.query(sqlSelect, [id], (err, results) => {
+
+    const imageName = results[0].image
+    //costruisco il path assoluto dell'immagine
+    const imagePath = path.join(__dirname, '../public/movies_cover/', imageName)
+    console.log('Path immagine', imagePath);
+    //elimino fisicamente immagine dall'hd
+    //fs libreria note
+    fs.unlink(imagePath, (err) => {
+      console.log(err);
+      return res.status(500).json({ error: 'Errore nell\'eliminazione del file immagine', err });
+    })
+    // res.json({ message: imagePath })
+
+
+    //una volta eliminata l'immagine elimino il record dal db
+    connection.query(sqlDelete, [id], (err, results) => {
+      if (err) return res.status(500).json({ error: 'Errore nella query del database', err });
+      res.json({ message: 'Libro eliminato con successo' })
+    })
+  })
+}
+
+
 module.exports = {
-  index, show, storeReviews, store
+  index, show, storeReviews, store, destroy
 }

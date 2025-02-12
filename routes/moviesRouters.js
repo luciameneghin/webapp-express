@@ -14,6 +14,8 @@ router.post('/:id/reviews', moviesController.storeReviews);
 //nuova rotta per aggiungere film
 // aggiungo solo /, perchè è il percorso in cui devo mettere il nuovo film 
 //gestione e salvataggio immagine con un middleware
-router.post('/', upload.single('image'), moviesController.store)
+router.post('/', upload.single('image'), moviesController.store);
+
+router.delete('/:id', moviesController.destroy);
 
 module.exports = router;
